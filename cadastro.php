@@ -28,6 +28,47 @@ $login = "";
 $nascimento = "";
 $senha = "";
 
+// verificar se tem um ID no GET, se tiver, buscar dados do usuario
+if (isset($_GET["id"])) {
+    $id = $_GET["id"];
+
+    // verificar se o ID é numerico
+    if (!is_numeric($id)) {
+        $erro = "ID inválido.";
+    } else {
+        //    buscar os dados do usuario no banco
+        // instrução SQL - SELECT = selecionar dados d euma tabela
+        $sql = "SELECT * FROM usuario WHERE usuario_id =?";
+        // comando para iniciar uma consulta
+        $stmt = $conexao->prepare($sql);
+        // vincular o parametro (id) ao comando SQL
+        $stmt->bind_param("i", $id);
+        // escular o comando SQL
+        $stmt->execute();
+        // pegar o resultado da consulta
+        $resultado = $stmt->get_result();
+        // verificar se encontrou o usuario
+        if ($resultado->num_rows > 0) {
+            // pegar os dados retornados
+            $linha = $resultado->fetch_object(); 
+            $nome = $linha->nome;
+            $email = $linha->email;
+            $nascimento = $linha->nascimento;
+            $login = $linha->login;
+        } else {
+            $erro = "Usuario não encontrado.";
+        }
+    }
+}
+
+
+
+
+
+
+
+
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Se o POST não existir o valor será " "
     $nome = $_POST["nome"] ?? "";
@@ -39,7 +80,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (strlen($nome) < 6) {
         $erro = "Informe o nome com pelo menos 5 caracteres";
     }
-    $sql = "INSERT INTO  usuarios (nome, email, login, nascimento, senha) VALUES (?, ?, ?, ?, ?)";
+    $sql = "INSERT INTO  usuario (nome, email, login, nascimento, senha) VALUES (?, ?, ?, ?, ?)";
     $stmt = $conexao->prepare($sql);
     $stmt->bind_param(
         "sssss",
@@ -86,7 +127,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             echo ("
             <div class='alert alert-danger my-3' role='alert'>
             $erro
-            ");
+            </div>");
         }
         ?>
         <!-- Formulario de Cadastro -->
@@ -104,7 +145,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <!-- email -->
                     <div class="mb-3">
                         <label for="email" class="form-label">email</label>
-                        <input type="email" class="form-control" value="<?php echo ($nome); ?>" id="email" name="email" required>
+                        <input type="email" class="form-control" value="<?php echo ($email); ?>" id="email" name="email" required>
                         <div class="invalid-feedback" required minlength="6" maxlength="100">
                             Informe um email valido
                         </div>
