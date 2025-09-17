@@ -18,6 +18,15 @@ $_GET = variaveis de envio de formulario GET
 $_SESSION = variaveis de sessão */
 
 include_once("./db/conexao.php");
+$erro = "";
+$mensagem = "";
+// Valores das variaveis dos campos do formulario (input)
+$id = "";
+$nome = "";
+$email = "";
+$login = "";
+$nascimento = "";
+$senha = "";
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Se o POST não existir o valor será " "
@@ -32,9 +41,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
     $sql = "INSERT INTO  usuarios (nome, email, login, nascimento, senha) VALUES (?, ?, ?, ?, ?)";
     $stmt = $conexao->prepare($sql);
-    $stmt->bind_param("sssss",
-     $nome, $email, $login, $nascimento, $senha);
-    $stmt->execute();
+    $stmt->bind_param(
+        "sssss",
+        $nome,
+        $email,
+        $login,
+        $nascimento,
+        $senha
+    );
+    // tratamento de erro
+    if ($stmt->execute() === true) {
+        $id = $stmt->insert_id;
+        $mensagem = "Usuário cadastrado com sucesso.";
+    } else {
+        $erro .= "Erro ao cadastrar o usuário: " . $stmt->error;
+    }
 }
 ?>
 <!doctype html>
@@ -53,26 +74,45 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <div class="card shadow bg-body-tertiary">
             <h3 class="p-3 fw-bold">Cadastro de Usuário</h3>
         </div>
+        <?php
+        if ($mensagem != "") {
+            echo ("
+            <div class='alert alert-success my-3' role='alert'>
+            $mensagem
+          </div>
+          ");
+        }
+        if ($erro != "") {
+            echo ("
+            <div class='alert alert-danger my-3' role='alert'>
+            $erro
+            ");
+        }
+        ?>
         <!-- Formulario de Cadastro -->
         <div class="card shadow bg-body-tertiary">
             <div class="card-body">
                 <form method="post">
                     <div class="mb-3">
+                        <label class="form-label">ID do Usuário</label>
+                        <input type="text" class="form-control" readonly id="codigo" name="codigo" value="<?php echo ($id); ?>">
+                    </div>
+                    <div class="mb-3">
                         <label class="form-label">Informe o seu nome: </label> <br>
-                        <input class="form-control" id="nome" name="nome">
+                        <input class="form-control" id="nome" name="nome" required required minlength="6" maxlength="200">
                     </div>
                     <!-- email -->
                     <div class="mb-3">
                         <label for="email" class="form-label">email</label>
-                        <input type="email" class="form-control" id="email" name="email" required>
-                        <div class="invalid-feedback">
+                        <input type="email" class="form-control" value="<?php echo ($nome); ?>" id="email" name="email" required>
+                        <div class="invalid-feedback" required minlength="6" maxlength="100">
                             Informe um email valido
                         </div>
                     </div>
                     <!-- login -->
                     <div class="mb-3">
                         <label for="login" class="form-label">Login</label>
-                        <input type="text" class="form-control" id="login" name="login" required>
+                        <input type="text" class="form-control" id="login" name="login" required minlength="6" maxlength="20">
                         <div class="invalid-feedback">
                             Informe um login
                         </div>
@@ -80,7 +120,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <!-- Data Nasc -->
                     <div class="mb-3">
                         <label for="nascimento" class="form-label">Data Nascimento</label>
-                        <input type="date" class="form-control" id="nascimento" name="nascimento" required>
+                        <input type="date" class="form-control" id="nascimento" name="nascimento" required
+                            min="1900-01-01" max="2020-01-01">
                         <div class="invalid-feedback">
                             Informe a data de nascimento
                         </div>
@@ -89,7 +130,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <div class="mb-3">
                         <label for="senha" class="form-label">Senha</label>
                         <input type="password" name="senha" id="senha"
-                            class="form-control" required minlength="6" maxlength="30">
+                            class="form-control" required minlength="6" maxlength="32">
                     </div>
                     <div>
                         <button class="btn btn-success">Gravar</button>
