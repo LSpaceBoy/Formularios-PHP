@@ -78,7 +78,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $senha = $_POST["senha"] ?? "";
     //echo("$nome - $email - $login - $nascimento - $senha");
     if (strlen($nome) < 6) {
-        $erro = "Informe o nome com pelo menos 5 caracteres";
+        $erro = "Informe o nome com pelo menos 6 caracteres";
     }
     $sql = "INSERT INTO  usuario (nome, email, login, nascimento, senha) VALUES (?, ?, ?, ?, ?)";
     $stmt = $conexao->prepare($sql);
