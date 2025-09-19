@@ -38,12 +38,12 @@ if (isset($_GET["id"])) {
     } else {
         //    buscar os dados do usuario no banco
         // instrução SQL - SELECT = selecionar dados d euma tabela
-        $sql = "SELECT * FROM usuario WHERE usuario_id =?";
+        $sql = "SELECT * FROM usuarios WHERE usuario_id =?";
         // comando para iniciar uma consulta
         $stmt = $conexao->prepare($sql);
         // vincular o parametro (id) ao comando SQL
         $stmt->bind_param("i", $id);
-        // escular o comando SQL
+        // executar o comando SQL
         $stmt->execute();
         // pegar o resultado da consulta
         $resultado = $stmt->get_result();
@@ -80,7 +80,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (strlen($nome) < 6) {
         $erro = "Informe o nome com pelo menos 6 caracteres";
     }
-    $sql = "INSERT INTO  usuario (nome, email, login, nascimento, senha) VALUES (?, ?, ?, ?, ?)";
+    $sql = "INSERT INTO  usuarios (nome, email, login, nascimento, senha) VALUES (?, ?, ?, ?, ?)";
     $stmt = $conexao->prepare($sql);
     $stmt->bind_param(
         "sssss",
@@ -89,6 +89,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $login,
         $nascimento,
         $senha
+        // Se der erro na bind_param, grandes chances de ser algum caractere errado e não esta conseguindo linkar na tabela do banco de dados
     );
     // tratamento de erro
     if ($stmt->execute() === true) {

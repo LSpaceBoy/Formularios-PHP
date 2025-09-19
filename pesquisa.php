@@ -1,3 +1,16 @@
+<?php
+// conexão com o banco de dados
+include_once("./db/conexao.php");
+// sql para selecionar todos os usuarios
+$sql = "SELECT * FROM usuarios ORDER BY nome";
+// Executar o comando SQL
+$resultado = $conexao->query($sql);
+// verificar quantas linhas foram retornadas
+$num_linhas = $resultado->num_rows;
+
+
+?>
+
 <!doctype html>
 <html lang="pt-BR">
 
@@ -69,35 +82,46 @@
                                 <!-- o <a> é um botão direcionado a uma pagina em especifica -->
                             </a>
                         </div>
-                        <div class="col-12 py-3">
+                        <div class="col-12 py-3 table-responsive">
+                            <!-- o col 12 sinaliza a largura da pagina que vai ser usada, que também no caso é o tamanho maximo no bootstrap -->
                             <table class="table table-hover">
                                 <thead>
                                     <tr>
                                         <th scope="col">#</th>
-                                        <th scope="col">First</th>
-                                        <th scope="col">Last</th>
-                                        <th scope="col">Handle</th>
+                                        <th scope="col">Nome</th>
+                                        <th scope="col">Login</th>
+                                        <th scope="col">email</th>
+                                        <th scope="col">Dt. Nasc.</th>
+                                        <th scope="col">Ações</th>
                                     </tr>
                                 </thead>
                                 <tbody>
+                                    <?php
+                                    $contador = 0;
+                                    while ($linha = $resultado->fetch_object()) {
+                                        $contador++;
+                                    
+                                    ?>
                                     <tr>
-                                        <th scope="row">1</th>
-                                        <td>Mark</td>
-                                        <td>Otto</td>
-                                        <td>@mdo</td>
+                                        <th scope="row"><?= $contador ?></th>
+                                        <td><?= $linha->nome ?></td>
+                                        <td><?= $linha->login ?></td>
+                                        <td><?= $linha->email ?></td>
+                                        <td><?= $linha->nascimento ?></td>
+                                        <td>
+                                            <a href="cadastro.php?id=<?= $linha->usuario_id ?> class=btn btn-primary btn-sm">
+                                                <span data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Alterar Cadastro">
+                                                    <i class="fa-solid fa-pen-to-square"></i>
+                                                </span>
+                                            </a>
+                                            <button class="btn btn-danger btn-sm">
+                                                <i class="fa-solid fa-trash"></i>
+
+                                            </button>
+                                        </td>
                                     </tr>
-                                    <tr>
-                                        <th scope="row">2</th>
-                                        <td>Jacob</td>
-                                        <td>Thornton</td>
-                                        <td>@fat</td>
-                                    </tr>
-                                    <tr>
-                                        <th scope="row">3</th>
-                                        <td>John</td>
-                                        <td>Doe</td>
-                                        <td>@social</td>
-                                    </tr>
+
+                                    <?php } ?>
                                 </tbody>
                             </table>
 
@@ -110,5 +134,9 @@
     </main>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
 </body>
+<script>
+    const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
+    const tooltipList = [...tooltipTriggerList].map(el => new bootstrap.Tooltip(el));
+</script>
 
 </html>
